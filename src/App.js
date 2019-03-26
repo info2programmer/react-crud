@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
+import Joi from "joi-browser";
 import axios from "axios";
 class App extends Component {
   constructor(props, context) {
@@ -14,6 +15,15 @@ class App extends Component {
       submitData: { productName: "", productDescription: "" },
       errors: {}
     };
+
+    this.schema = {
+      productName: Joi.string()
+        .required()
+        .label("Product Name"),
+      productDescription: Joi.string()
+        .required()
+        .label("Product Description")
+    };
   }
 
   handleClose() {
@@ -25,13 +35,21 @@ class App extends Component {
   }
 
   validate() {
+    const option = { abortEarly: false };
+    const { error } = Joi.validate(this.state.submitData, this.schema, option);
+
+    if (!error) return null;
+
     const errors = {};
-    const { submitData } = this.state;
-    if (submitData.productName.trim() === "")
-      errors.productName = "Product Name is Required";
-    if (submitData.productDescription.trim() === "")
-      errors.productDescription = "Product Description is Required";
-    return Object.keys(errors).length === 0 ? null : errors;
+    for (let item of error.details) errors[item.path[0]] = item.message;
+
+    return errors;
+    // const { submitData } = this.state;
+    // if (submitData.productName.trim() === "")
+    //   errors.productName = "Product Name is Required";
+    // if (submitData.productDescription.trim() === "")
+    //   errors.productDescription = "Product Description is Required";
+    // return Object.keys(errors).length === 0 ? null : errors;
   }
 
   handelSubmit = e => {
