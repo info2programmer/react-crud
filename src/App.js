@@ -37,7 +37,7 @@ class App extends Component {
   handelSubmit = e => {
     e.preventDefault();
     const errors = this.validate();
-    this.setState({ errors });
+    this.setState({ errors: errors || {} });
     if (errors) return;
     console.log("Submitted", this.state.submitData);
   };
