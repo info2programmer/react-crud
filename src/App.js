@@ -52,6 +52,13 @@ class App extends Component {
     // return Object.keys(errors).length === 0 ? null : errors;
   }
 
+  validateProperty({ name, value }) {
+    const obj = { [name]: value };
+    const schema = { [name]: this.schema[name] };
+    const { error } = Joi.validate(obj, schema);
+    return error ? error.details[0].message : null;
+  }
+
   handelSubmit = e => {
     e.preventDefault();
     const errors = this.validate();
@@ -71,9 +78,14 @@ class App extends Component {
   }
 
   handelInputChange = ({ currentTarget: input }) => {
+    const errors = { ...this.state.errors };
+    const errorMessage = this.validateProperty(input);
+    if (errorMessage) errors[input.name] = errorMessage;
+    else delete errors[input.name];
+
     const submitData = { ...this.state.submitData };
     submitData[input.name] = input.value;
-    this.setState({ submitData });
+    this.setState({ submitData, errors });
   };
   render() {
     const books = this.state.books.map((book, i) => {
