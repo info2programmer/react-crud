@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import Joi from "joi-browser";
 import axios from "axios";
-class App extends Component {
+import CustomeForm from "./common/customeForm";
+
+class App extends CustomeForm {
   constructor(props, context) {
     super(props, context);
 
@@ -12,7 +14,7 @@ class App extends Component {
     this.state = {
       show: false,
       books: [],
-      submitData: { productName: "", productDescription: "" },
+      data: { productName: "", productDescription: "" },
       errors: {}
     };
 
@@ -34,37 +36,15 @@ class App extends Component {
     this.setState({ show: true });
   }
 
-  validate() {
-    const option = { abortEarly: false };
-    const { error } = Joi.validate(this.state.submitData, this.schema, option);
-
-    if (!error) return null;
-
-    const errors = {};
-    for (let item of error.details) errors[item.path[0]] = item.message;
-
-    return errors;
-    // const { submitData } = this.state;
-    // if (submitData.productName.trim() === "")
-    //   errors.productName = "Product Name is Required";
-    // if (submitData.productDescription.trim() === "")
-    //   errors.productDescription = "Product Description is Required";
-    // return Object.keys(errors).length === 0 ? null : errors;
-  }
-
-  validateProperty({ name, value }) {
-    const obj = { [name]: value };
-    const schema = { [name]: this.schema[name] };
-    const { error } = Joi.validate(obj, schema);
-    return error ? error.details[0].message : null;
-  }
-
-  handelSubmit = e => {
-    e.preventDefault();
-    const errors = this.validate();
-    this.setState({ errors: errors || {} });
-    if (errors) return;
-    console.log("Submitted", this.state.submitData);
+  doSubmit = async () => {
+    const obj = this.state.data;
+    const { data: book } = await axios.post(
+      "https://www.bebongstore.com/Manage_api/submitList",
+      obj
+    );
+    console.log(book);
+    const books = [book, ...this.state.books];
+    this.setState({ books });
   };
 
   async componentWillMount() {
@@ -77,16 +57,6 @@ class App extends Component {
       });
   }
 
-  handelInputChange = ({ currentTarget: input }) => {
-    const errors = { ...this.state.errors };
-    const errorMessage = this.validateProperty(input);
-    if (errorMessage) errors[input.name] = errorMessage;
-    else delete errors[input.name];
-
-    const submitData = { ...this.state.submitData };
-    submitData[input.name] = input.value;
-    this.setState({ submitData, errors });
-  };
   render() {
     const books = this.state.books.map((book, i) => {
       return (
@@ -109,7 +79,7 @@ class App extends Component {
         </tr>
       );
     });
-    const { submitData, errors } = this.state;
+    const { data, errors } = this.state;
     return (
       <div className="container">
         <Button variant="success" className="m-2" onClick={this.handleShow}>
@@ -138,7 +108,7 @@ class App extends Component {
                 <Form.Control
                   type="text"
                   placeholder="Enter Product Name"
-                  value={submitData.productName}
+                  value={data.productName}
                   name="productName"
                   onChange={this.handelInputChange}
                 />
@@ -154,7 +124,7 @@ class App extends Component {
                   as="textarea"
                   rows="3"
                   placeholder="Enter Product Description"
-                  value={submitData.productDescription}
+                  value={data.productDescription}
                   name="productDescription"
                   onChange={this.handelInputChange}
                 />
@@ -169,9 +139,7 @@ class App extends Component {
               <Button variant="secondary" onClick={this.handleClose}>
                 Close
               </Button>
-              <Button type="submit" variant="primary">
-                Save Changes
-              </Button>
+              {this.randerButton("Submit")}
             </Modal.Footer>
           </Form>
         </Modal>
