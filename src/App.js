@@ -44,7 +44,10 @@ class App extends CustomeForm {
     );
     console.log(book);
     const books = [book, ...this.state.books];
-    this.setState({ books });
+    this.setState({
+      books: books,
+      data: { productName: "", productDescription: "" }
+    });
   };
 
   async componentWillMount() {
