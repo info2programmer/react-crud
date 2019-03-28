@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import Joi from "joi-browser";
+import ToastContainer, { toast } from "react-toastify";
 import axios from "axios";
 import CustomeForm from "./common/customeForm";
+import "react-toastify/dist/ReactToastify.css";
 
 class App extends CustomeForm {
   constructor(props, context) {
@@ -48,6 +50,7 @@ class App extends CustomeForm {
       books: books,
       data: { productName: "", productDescription: "" }
     });
+    toast.success("Data Insert Successfully");
   };
 
   async componentWillMount() {
@@ -85,6 +88,7 @@ class App extends CustomeForm {
     const { data, errors } = this.state;
     return (
       <div className="container">
+        <ToastContainer />
         <Button variant="success" className="m-2" onClick={this.handleShow}>
           <i className="fa fa-plus mr-1" />
           Add New Product
