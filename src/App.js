@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import Joi from "joi-browser";
-import ToastContainer, { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import CustomeForm from "./common/customeForm";
 import "react-toastify/dist/ReactToastify.css";
@@ -50,6 +50,7 @@ class App extends CustomeForm {
       books: books,
       data: { productName: "", productDescription: "" }
     });
+    this.handleClose();
     toast.success("Data Insert Successfully");
   };
 
